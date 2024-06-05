@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { addTodo, changeTodo, fetchTodos, removeTodo } from '../redux/Slice/TodoSlice';
+import { RootState, AppDispatch } from '../redux/store';
 
 
-const ReduxTodolist = () => {
+const ReduxTodolist: React.FC = () => {
 
-    const todos = useSelector(state => state.todos.todolist);
-    const dispatch = useDispatch();
+    const todos = useSelector((state: RootState) => state.todos.todolist);
+    const dispatch = useDispatch<AppDispatch>();
 
     const [input, setInput] = useState('');
-    const [editInput, setEditInput] = useState(null);
-    const [editId, setEditId] = useState(null);
+    const [editInput, setEditInput] = useState<string | null>(null);
+    const [editId, setEditId] = useState<string | null>(null);
 
     useEffect(() => {
         dispatch(fetchTodos());
@@ -28,7 +29,7 @@ const ReduxTodolist = () => {
         }
     }
 
-   const handleDelete = async (id) => {
+   const handleDelete = async (id: string) => {
         try {
             dispatch(removeTodo({id: id}));
         } catch(err) {
@@ -36,14 +37,14 @@ const ReduxTodolist = () => {
         }
     }
 
-    const handleEdit = async (id) => {
+    const handleEdit = async (id: string) => {
         if (editId === null) {
             setEditId(id);
-            const changedContent = todos.find(item => item.id === id).content;
+            const changedContent = todos.find(item => item.id === id)?.content || '';
             setEditInput(changedContent);
         } else {
             try {
-                dispatch(changeTodo({id, content: {content: editInput}}))
+                dispatch(changeTodo({ id, content: { content: editInput! } }));
                 setEditId(null)
                 setEditInput(null);
             } catch(err) {
@@ -67,10 +68,10 @@ const ReduxTodolist = () => {
                     todos?.map((item, index) => {
                         const isEdit = item.id === editId;
                         return <li key={item.id}>
-                            {isEdit ? <input value={editInput} onChange={(event) => {setEditInput(event.target.value)}} /> : <span>{item.content}</span>}
+                            {isEdit ? <input value={editInput || ''} onChange={(event) => {setEditInput(event.target.value)}} /> : <span>{item.content}</span>}
                             {/* if the item is editable, edit buttonis changed to save button */}
-                            <button onClick={() => {handleEdit(item.id)}}>{editId === item.id ? <span>save</span> : <span>edit</span>}</button>
-                            <button onClick={() => {handleDelete(item.id)}}>delete</button>
+                            <button onClick={() => {handleEdit(item.id!)}}>{editId === item.id ? <span>save</span> : <span>edit</span>}</button>
+                            <button onClick={() => {handleDelete(item.id!)}}>delete</button>
                         </li>
                     })
                 }

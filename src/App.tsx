@@ -1,9 +1,8 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
-import Todolist from './components/Todolist';
 import ReduxTodolist from './components/ReduxTodolist';
 
-function App() {
+const App: React.FC = () => {
   return (
     <div style={{ margin: '100px' }}>
       <ReduxTodolist />
