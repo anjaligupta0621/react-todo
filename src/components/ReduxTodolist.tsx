@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { addTodo, changeTodo, fetchTodos, removeTodo } from '../redux/Slice/TodoSlice';
 import { RootState, AppDispatch } from '../redux/store';
+import { logoutUser } from '../redux/Slice/AuthSlice';
 
 
 const ReduxTodolist: React.FC = () => {
@@ -53,6 +54,10 @@ const ReduxTodolist: React.FC = () => {
         }
     }
 
+    const handleLogout = () => {
+        dispatch(logoutUser());
+    }
+
   return (
     <div>
         <div>
@@ -76,6 +81,9 @@ const ReduxTodolist: React.FC = () => {
                     })
                 }
             </ul>
+        </div>
+        <div>
+            <button onClick={handleLogout}>Log out</button>
         </div>
     </div>
   )

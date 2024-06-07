@@ -1,9 +1,11 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import todoReducer from "./Slice/TodoSlice";
+import authReducer from "./Slice/AuthSlice";
 
 const store = configureStore({
   reducer: {
     todos: todoReducer,
+    auth: authReducer,
   },
 });
 

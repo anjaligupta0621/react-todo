@@ -1,6 +1,4 @@
 import {  createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createTodo, deleteTodo, getTodos, updateTodo } from "../../APIs/todoAPIs";
-import {RootState} from '../store';
 
 interface Todo {
     id?: string,
@@ -15,13 +13,17 @@ const initialState: TodoState = {
   todolist: [],
 };
 
-const fetchTodos = createAsyncThunk<Todo[]>(
+const fetchTodos = createAsyncThunk<any>(
     'todos/fetchTodos',
-    async () => {
+    async() => {
         console.log("inside async")
-      const response = await getTodos();
-      console.log(response)
-      return response;
+    try {
+        const response = await fetch('http://localhost:3000/todos');
+        const data = await response.json();
+        return data;
+        } catch (err) {
+            console.log(err)
+    }
     },
   )
 
@@ -29,20 +31,37 @@ const addTodo = createAsyncThunk<Todo, Todo>(
     'todos/addTodos',
     async (payload) => {
         console.log("Inside create todos");
-        const response = await createTodo(payload);
-        console.log(response);
-        return response;
+        try {
+            const response = await fetch('http://localhost:3000/todos', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            console.log(data);
+            return data;
+        } catch(err) {
+            console.log(err);
+        }
     }
 )
 
-const removeTodo = createAsyncThunk<Todo, {id: string}>(
+const removeTodo = createAsyncThunk<Todo, any>(
     'todos/removeTodo',
     async (payload) => {
         console.log("Inside remove todos");
-        console.log(payload)
-        const response = await deleteTodo(payload.id);
-        console.log(response);
-        return response;
+        try {
+            const response = await fetch(`http://localhost:3000/todos/${payload.id}`, {
+                method: "DELETE"
+            });
+            const data = await response.json();
+            console.log(data);
+            return data;
+        } catch(err) {
+            console.log(err);
+        }
     }
 )
 
@@ -50,10 +69,20 @@ const changeTodo = createAsyncThunk<Todo, { id: string; content: {content: strin
     'todos/changeTodo',
     async (payload) => {
         console.log("Inside change todos");
-        console.log(payload);
-        const response = await updateTodo(payload.id, payload.content);
-        console.log(response);
-        return response;
+        try {
+            const response = await fetch(`http://localhost:3000/todos/${payload.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload.content)
+            });
+            const data = await response.json();
+            console.log(data);
+            return data;
+        } catch(err) {
+            console.log(err);
+        }
     }
 )
 
@@ -63,8 +92,8 @@ export const todoSlice = createSlice({
   reducers: {
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchTodos.fulfilled, (state, action: PayloadAction<Todo[]>) => {
-      state.todolist = action.payload;
+    builder.addCase(fetchTodos.fulfilled, (state, action: any) => {
+      state.todolist = action.payload.todos;
     })
     .addCase(addTodo.fulfilled, (state, action: PayloadAction<Todo>) => {
         state.todolist.push(action.payload);
